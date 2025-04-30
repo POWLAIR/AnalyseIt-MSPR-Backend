@@ -1,0 +1,22 @@
+[flake8]
+max-line-length = 120
+ignore = E203, E266, E302, E501, W503, F403, E402, W293, W291, W292
+exclude = .git, __pycache__, env, venv, .venv, migrations
+max-complexity = 15
+
+
+# max-line-length = 120 → Autorise des lignes plus longues (au lieu de la limite par défaut de 79).
+# ignore = ... → Ignore certaines règles de Flake8 :
+
+#     E203 : Problèmes d’espacement autour des : (évite un conflit avec black).
+#     E266 : Trop de # pour un commentaire.
+#     E302 : saut de ligne.
+#     E402 : Importation de module non utilisé.
+#     E501 : Trop longue ligne (on la gère avec max-line-length).
+#     W503 : Saut de ligne avant un opéracommentaireteur (incohérent avec black).
+#     W291 : Trop de blancs à la fin de la ligne.
+
+#     F403 : from module import * interdit → on l’autorise.
+
+# exclude = ... → Ignore certains dossiers (venv, migrations, etc.).
+# max-complexity = 15 → Autorise des fonctions plus complexes.
