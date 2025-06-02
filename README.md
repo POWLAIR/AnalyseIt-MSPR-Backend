@@ -5,24 +5,30 @@ Il expose une API RESTful connectée à une base de données **MySQL** avec supp
 
 ---
 
-## 🌟 Fonctionnalités
+## �� Fonctionnalités
 
-- API RESTful documentée (Swagger / ReDoc)
-- Gestion des épidémies et statistiques associées
-- Intégration de datasets Kaggle via pipeline ETL
-- Système de visualisation analytique
-- Support des localisations et sources de données
+- **API RESTful** documentée (Swagger / ReDoc)
+- **Authentification JWT** complète avec gestion des rôles
+- **Gestion des épidémies** et statistiques associées
+- **Intégration de datasets Kaggle** via pipeline ETL
+- **Système de visualisation analytique**
+- **Support des localisations** et sources de données
+- **Architecture en couches** (API, Service, Data Access)
 
 ---
 
 ## 🛠️ Technologies
 
-- **FastAPI** (0.109.0)
-- **SQLAlchemy** (2.0.25)
-- **PyMySQL**, **Pydantic**, **Pandas**, **NumPy**
-- **Alembic** (migrations)
-- **Kaggle Hub** (import de données)
-- **Pytest** (tests)
+- **FastAPI** (0.109.0) - Framework web moderne
+- **SQLAlchemy** (2.0.25) - ORM Python
+- **PyMySQL** - Connecteur MySQL
+- **Pydantic** - Validation de données
+- **Pandas**, **NumPy** - Traitement de données
+- **Alembic** - Migrations de base de données
+- **Kaggle Hub** - Import de données
+- **Pytest** - Tests unitaires
+- **JWT** - Authentification sécurisée
+- **bcrypt** - Hachage de mots de passe
 
 ---
 
@@ -37,14 +43,13 @@ AnalyseIt-MSPR-Backend/
 │   │   └── dependencies.py    # Dépendances API
 │   ├── core/                  # Configuration et sécurité
 │   │   ├── config/            # Paramètres de configuration
-│   │   ├── deps.py            # Dépendances centrales
-│   │   └── security.py        # Sécurité et authentification
+│   │   ├── deps.py            # Dépendances centrales (auth, admin)
+│   │   └── security.py        # Sécurité JWT et authentification
 │   ├── db/                    # Data Access Layer
 │   │   ├── models/            # Modèles SQLAlchemy
 │   │   ├── repositories/      # Repositories pour l'accès aux données
 │   │   └── session.py         # Configuration de session DB
 │   ├── services/              # Service Layer (logique métier)
-│   ├── crud/                  # Opérations CRUD
 │   ├── utils/                 # Utilitaires et helpers
 │   └── main.py                # Point d'entrée FastAPI
 ├── core/                      # Configuration globale du projet
@@ -67,14 +72,27 @@ AnalyseIt-MSPR-Backend/
 
 ---
 
-## ⚙️ Installation locale
+## 🚀 Démarrage rapide avec Docker
 
-### Méthode rapide (recommandée)
+### Prérequis
+- Docker et Docker Compose installés
+- Port 8000 et 3306 disponibles
+
+### Lancement
 ~~~bash
 git clone <URL_DU_REPO_BACKEND>
-cd AnalyseIt-MSPR-Backend
-./start.sh
+cd AnalyseIt-MSPR-Backend/core
+docker-compose up --build -d
 ~~~
+
+### Accès à l'API
+- **Documentation Swagger** : [http://localhost:8000/docs](http://localhost:8000/docs)
+- **Documentation ReDoc** : [http://localhost:8000/redoc](http://localhost:8000/redoc)
+- **Santé de l'API** : [http://localhost:8000/health](http://localhost:8000/health)
+
+---
+
+## ⚙️ Installation locale
 
 ### Méthode manuelle
 ~~~bash
@@ -88,7 +106,7 @@ cp .env.example .env  # Configurer selon vos besoins
 
 ---
 
-## 🔧 Exemple de `.env`
+## 🔧 Configuration (.env)
 
 ~~~env
 # Configuration de base de données
@@ -102,7 +120,10 @@ DB_NAME=analyseit
 # Configuration API
 API_HOST=0.0.0.0
 API_PORT=8000
+
+# Sécurité JWT
 SECRET_KEY=your-secret-key-change-this-in-production
+ACCESS_TOKEN_EXPIRE_MINUTES=30
 
 # Configuration optionnelle
 ENABLE_API_TECHNIQUE=false
@@ -111,25 +132,68 @@ ENABLE_DATAVIZ=false
 
 ---
 
+## 🔐 Authentification
+
+Le système d'authentification JWT est complet avec :
+
+### Endpoints disponibles
+- **POST** `/api/v1/auth/register` - Créer un compte
+- **POST** `/api/v1/auth/login` - Se connecter
+- **GET** `/api/v1/auth/me` - Profil utilisateur
+- **POST** `/api/v1/auth/logout` - Se déconnecter
+
+### Exemple d'utilisation
+~~~bash
+# Créer un utilisateur admin
+curl -X POST http://localhost:8000/api/v1/auth/register \
+  -H "Content-Type: application/json" \
+  -d '{"email": "admin@test.com", "password": "admin123", "is_admin": true}'
+
+# Se connecter
+curl -X POST http://localhost:8000/api/v1/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email": "admin@test.com", "password": "admin123"}'
+~~~
+
+### Protection des routes
+- Routes publiques : `/health`, `/docs`, `/auth/*`
+- Routes protégées : Nécessitent un token JWT valide
+- Routes admin : Nécessitent le rôle administrateur
+
+---
+
+## 📊 Endpoints principaux
+
+### Épidémies
+- **GET** `/api/v1/epidemics/` - Liste des épidémies
+- **POST** `/api/v1/epidemics/` - Créer une épidémie
+- **GET** `/api/v1/epidemics/{id}` - Détails d'une épidémie
+- **PUT** `/api/v1/epidemics/{id}` - Modifier une épidémie
+- **DELETE** `/api/v1/epidemics/{id}` - Supprimer une épidémie
+
+### Statistiques
+- **GET** `/api/v1/stats/dashboard` - Statistiques du tableau de bord
+- **GET** `/api/v1/epidemics/stats/dashboard` - Stats détaillées des épidémies
+
+### Administration
+- **POST** `/api/v1/admin/init-db` - Initialiser la base de données
+- **POST** `/api/v1/admin/run-etl` - Lancer le processus ETL
+- **GET** `/api/v1/admin/extract-data` - Extraire les données Kaggle
+
+---
+
 ## 🏃‍♂️ Lancement
+
+### Avec Docker (recommandé)
+~~~bash
+cd core
+docker-compose up --build -d
+~~~
 
 ### Développement local
 ~~~bash
-./start.sh
-~~~
-
-### Avec Docker
-~~~bash
-./start-docker.sh
-~~~
-
-### Manuel
-~~~bash
 uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 ~~~
-
-- Swagger : [http://localhost:8000/docs](http://localhost:8000/docs)
-- ReDoc : [http://localhost:8000/redoc](http://localhost:8000/redoc)
 
 ---
 
@@ -145,28 +209,24 @@ pytest tests/test_api.py -v
 
 ## 🐳 Docker
 
-### Démarrage rapide
-~~~bash
-./start-docker.sh
-~~~
-
-### Manuel
-~~~bash
-cd core
-docker-compose up --build -d
-~~~
-
 ### Commandes utiles
 ~~~bash
 # Voir les logs
-cd core && docker-compose logs -f
+cd core && docker-compose logs -f backend
 
 # Arrêter les services
 cd core && docker-compose down
 
 # Reconstruire les images
 cd core && docker-compose build --no-cache
+
+# Voir l'état des conteneurs
+cd core && docker-compose ps
 ~~~
+
+### Services Docker
+- **backend** : API FastAPI (port 8000)
+- **mysql_db** : Base de données MySQL (port 3306)
 
 ---
 
@@ -211,27 +271,34 @@ git commit -m "fix(api): correction du timeout sur l'endpoint /users"
 git commit -m "docs(readme): mise à jour de la documentation"
 ```
 
-### Règles
-
-1. Le type et le sujet sont obligatoires
-2. Le scope est optionnel
-3. Le sujet doit être en minuscules
-4. Le sujet ne doit pas dépasser 72 caractères
-5. Le sujet ne doit pas se terminer par un point
-6. Le corps et le pied de page sont optionnels
-7. Le corps et le pied de page doivent être séparés par une ligne vide
-8. Chaque ligne du corps et du pied de page ne doit pas dépasser 72 caractères
-
-Pour plus de détails, consultez le fichier [commit-msg](commit-msg).
-
 ---
 
 ## 🔐 Sécurité
 
-- Protection CORS
-- Validation stricte via Pydantic
-- Variables d'environnement pour les secrets
-- Authentification JWT (projetée)
+- **Protection CORS** configurée
+- **Validation stricte** via Pydantic
+- **Variables d'environnement** pour les secrets
+- **Authentification JWT** avec tokens sécurisés
+- **Hachage bcrypt** pour les mots de passe
+- **Protection des routes** par rôles
+
+---
+
+## 🏗️ Architecture
+
+### Couches de l'application
+1. **API Layer** (`app/api/`) : Gestion des requêtes HTTP et validation
+2. **Service Layer** (`app/services/`) : Logique métier
+3. **Data Access Layer** (`app/db/`) : Accès aux données
+4. **Model Layer** (`app/db/models/`) : Définition des entités
+
+### Modèles de données
+- **User** : Utilisateurs avec authentification
+- **Epidemic** : Épidémies et leurs métadonnées
+- **DailyStats** : Statistiques quotidiennes
+- **Localisation** : Données géographiques
+- **DataSource** : Sources de données
+- **OverallStats** : Statistiques globales
 
 ---
 
@@ -239,7 +306,7 @@ Pour plus de détails, consultez le fichier [commit-msg](commit-msg).
 
 ~~~bash
 git checkout -b feature/ma-feature
-git commit -m "Ajout d'une fonctionnalité"
+git commit -m "feat: ajout d'une fonctionnalité"
 git push origin feature/ma-feature
 ~~~
 Ouvre une Pull Request !
@@ -249,3 +316,13 @@ Ouvre une Pull Request !
 ## 📝 Licence
 
 Ce projet est sous licence MIT.
+
+---
+
+## 🆘 Support
+
+En cas de problème :
+1. Vérifiez que Docker est démarré
+2. Consultez les logs : `cd core && docker-compose logs -f`
+3. Testez la santé de l'API : `curl http://localhost:8000/health`
+4. Consultez la documentation Swagger : `http://localhost:8000/docs`
