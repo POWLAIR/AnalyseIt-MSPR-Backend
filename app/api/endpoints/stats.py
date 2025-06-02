@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-from ..db.session import get_db
-from ..services.stats_service import StatsService
+from app.db.session import get_db
+from app.services.stats_service import StatsService
 import logging
 
 logger = logging.getLogger(__name__)

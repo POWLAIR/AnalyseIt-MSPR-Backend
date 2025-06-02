@@ -6,12 +6,14 @@ from sqlalchemy import inspect
 from .core.config.settings import settings
 from .db.session import engine
 from .db.models.base import Base
-from .routes import stats, epidemics, dashboard, daily_stats, locations, data_sources
-from .api.endpoints import admin
+from .api.endpoints import (
+    stats_router, epidemics_router, dashboard_router, 
+    daily_stats_router, location_router, data_sources_router, admin_router, auth_router
+)
 
 # --- optionnel ---
 try:
-    from .routes import api_technique  # Si jamais on veut séparer api technique plus tard
+    from .api.endpoints import api_technique  # Si jamais on veut séparer api technique plus tard
 except ImportError:
     api_technique = None
 
@@ -60,37 +62,42 @@ async def startup_db_client():
 
 # Base API toujours incluse
 app.include_router(
-    epidemics.router,
+    auth_router,
+    prefix=f"{settings.API_V1_STR}/auth",
+    tags=["Authentification"]
+)
+app.include_router(
+    epidemics_router,
     prefix=f"{settings.API_V1_STR}/epidemics",
     tags=["Épidémies"]
 )
 app.include_router(
-    dashboard.router,
+    dashboard_router,
     prefix=f"{settings.API_V1_STR}/dashboard",
     tags=["Analyse détaillée"]
 )
 app.include_router(
-    stats.router,
+    stats_router,
     prefix=f"{settings.API_V1_STR}/stats",
     tags=["Statistiques"]
 )
 app.include_router(
-    admin.router,
+    admin_router,
     prefix=f"{settings.API_V1_STR}/admin",
     tags=["Administration"]
 )
 app.include_router(
-    daily_stats.router,
+    daily_stats_router,
     prefix=f"{settings.API_V1_STR}/daily-stats",
     tags=["Statistiques quotidiennes"]
 )
 app.include_router(
-    locations.router,
+    location_router,
     prefix=f"{settings.API_V1_STR}/locations",
     tags=["Localisations"]
 )
 app.include_router(
-    data_sources.router,
+    data_sources_router,
     prefix=f"{settings.API_V1_STR}/data-sources",
     tags=["Sources de données"]
 )
@@ -109,7 +116,7 @@ if settings.ENABLE_API_TECHNIQUE:
 
 if settings.ENABLE_DATAVIZ:
     try:
-        from .routes import dataviz
+        from .api.endpoints import dataviz
         app.include_router(
             dataviz.router,
             prefix=f"{settings.API_V1_STR}/dataviz",

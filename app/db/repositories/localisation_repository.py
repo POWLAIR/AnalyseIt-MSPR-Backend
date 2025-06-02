@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
 from typing import List, Optional, Dict, Any
-from ..models.localisation import Localisation
+from app.db.models.base import Localisation
 import logging
 
 logger = logging.getLogger(__name__)
@@ -92,5 +92,24 @@ def delete_localisation(db: Session, localisation_id: int) -> bool:
     except Exception as e:
         db.rollback()
         logger.error(f"Erreur lors de la suppression de la localisation {localisation_id}: {str(e)}")
-        raise 
+        raise
+
+# Alias pour compatibilité avec location.py
+get_locations = get_localisations
+get_location = get_localisation
+delete_location = delete_localisation
+
+def create_location(db: Session, location) -> Localisation:
+    """
+    Crée une nouvelle localisation à partir d'un schéma Pydantic.
+    """
+    location_data = location.model_dump() if hasattr(location, 'model_dump') else location.dict()
+    return create_localisation(db, location_data)
+
+def update_location(db: Session, location_id: int, location) -> Optional[Localisation]:
+    """
+    Met à jour une localisation à partir d'un schéma Pydantic.
+    """
+    location_data = location.model_dump(exclude_unset=True) if hasattr(location, 'model_dump') else location.dict(exclude_unset=True)
+    return update_localisation(db, location_id, location_data) 
     

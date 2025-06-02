@@ -1,9 +1,11 @@
 from typing import List, Optional
 
 from sqlalchemy.orm import Session
+from sqlalchemy import func
+from pydantic import BaseModel
 
 from app.crud.base import CRUDBase
-from app.models.location import Location
+from app.db.models.location import Location
 from app.api.schemas.location import LocationCreate, LocationUpdate
 
 class CRUDLocation(CRUDBase[Location, LocationCreate, LocationUpdate]):

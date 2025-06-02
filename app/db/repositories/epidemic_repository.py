@@ -3,8 +3,8 @@ from typing import List, Optional, Dict, Any
 from sqlalchemy import desc, func
 import logging
 
-from ..models.base import Epidemic, DailyStats, Localisation, OverallStats
-from ...api.schemas import (
+from app.db.models.base import Epidemic, DailyStats, Localisation, OverallStats
+from app.api.schemas import (
     EpidemicCreate,
     EpidemicUpdate
 )

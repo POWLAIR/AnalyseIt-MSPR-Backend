@@ -6,6 +6,9 @@ from pydantic import BaseModel, HttpUrl
 from typing import Optional
 from datetime import date
 
+# Import des schémas de location
+from .location import Location, LocationCreate, LocationUpdate
+
 # Epidemic schemas
 class EpidemicBase(BaseModel):
     name: str

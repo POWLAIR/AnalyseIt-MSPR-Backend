@@ -29,34 +29,61 @@ Il expose une API RESTful connectée à une base de données **MySQL** avec supp
 ## 📁 Structure du projet
 
 ~~~bash
-backend/
-├── app/
-│   ├── api/endpoints/         # Routes API
-│   ├── core/config/           # Configuration
-│   ├── db/models/             # Modèles SQL
-│   ├── db/repositories/       # Requêtes DB
-│   ├── db/session.py          # Session DB
-│   ├── routes/                # Routage
-│   ├── services/              # Logique métier
-│   ├── utils/                 # Utilitaires
+AnalyseIt-MSPR-Backend/
+├── app/                       # Backend FastAPI
+│   ├── api/                   # API Layer
+│   │   ├── endpoints/         # Routes API (auth, epidemics, stats, etc.)
+│   │   ├── schemas/           # Schémas Pydantic
+│   │   └── dependencies.py    # Dépendances API
+│   ├── core/                  # Configuration et sécurité
+│   │   ├── config/            # Paramètres de configuration
+│   │   ├── deps.py            # Dépendances centrales
+│   │   └── security.py        # Sécurité et authentification
+│   ├── db/                    # Data Access Layer
+│   │   ├── models/            # Modèles SQLAlchemy
+│   │   ├── repositories/      # Repositories pour l'accès aux données
+│   │   └── session.py         # Configuration de session DB
+│   ├── services/              # Service Layer (logique métier)
+│   ├── crud/                  # Opérations CRUD
+│   ├── utils/                 # Utilitaires et helpers
 │   └── main.py                # Point d'entrée FastAPI
-├── tests/                     # Tests
+├── core/                      # Configuration globale du projet
+│   ├── Dockerfile             # Configuration Docker
+│   ├── docker-compose.yml     # Orchestration des services
+│   ├── requirements.txt       # Dépendances Python
+│   └── .flake8               # Configuration linter
 ├── sql/                       # Scripts SQL
-├── requirements.txt
-└── Dockerfile
+│   ├── schemas/               # Scripts de création de tables
+│   ├── migrations/            # Scripts de migration
+│   └── seeds/                 # Données initiales
+├── src/                       # Frontend TypeScript/JavaScript
+│   ├── config/                # Configuration frontend
+│   ├── controllers/           # Contrôleurs MVC
+│   ├── routes/                # Routes frontend
+│   ├── services/              # Services API
+│   └── types/                 # Types TypeScript
+└── tests/                     # Tests unitaires et d'intégration
 ~~~
 
 ---
 
 ## ⚙️ Installation locale
 
+### Méthode rapide (recommandée)
 ~~~bash
 git clone <URL_DU_REPO_BACKEND>
-cd backend
+cd AnalyseIt-MSPR-Backend
+./start.sh
+~~~
+
+### Méthode manuelle
+~~~bash
+git clone <URL_DU_REPO_BACKEND>
+cd AnalyseIt-MSPR-Backend
 python -m venv venv
 source venv/bin/activate  # ou venv\Scripts\activate sur Windows
-pip install -r requirements.txt
-cp .env.example .env
+pip install -r core/requirements.txt
+cp .env.example .env  # Configurer selon vos besoins
 ~~~
 
 ---
@@ -64,16 +91,39 @@ cp .env.example .env
 ## 🔧 Exemple de `.env`
 
 ~~~env
+# Configuration de base de données
 DATABASE_URL=mysql://user:password@localhost:3306/analyseit
+DB_USER=user
+DB_PASSWORD=password
+DB_HOST=localhost
+DB_PORT=3306
+DB_NAME=analyseit
+
+# Configuration API
 API_HOST=0.0.0.0
 API_PORT=8000
-SECRET_KEY=your-secret-key
+SECRET_KEY=your-secret-key-change-this-in-production
+
+# Configuration optionnelle
+ENABLE_API_TECHNIQUE=false
+ENABLE_DATAVIZ=false
 ~~~
 
 ---
 
 ## 🏃‍♂️ Lancement
 
+### Développement local
+~~~bash
+./start.sh
+~~~
+
+### Avec Docker
+~~~bash
+./start-docker.sh
+~~~
+
+### Manuel
 ~~~bash
 uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 ~~~
@@ -95,9 +145,27 @@ pytest tests/test_api.py -v
 
 ## 🐳 Docker
 
+### Démarrage rapide
 ~~~bash
-docker build -t analyseit-backend .
-docker run -p 8000:8000 analyseit-backend
+./start-docker.sh
+~~~
+
+### Manuel
+~~~bash
+cd core
+docker-compose up --build -d
+~~~
+
+### Commandes utiles
+~~~bash
+# Voir les logs
+cd core && docker-compose logs -f
+
+# Arrêter les services
+cd core && docker-compose down
+
+# Reconstruire les images
+cd core && docker-compose build --no-cache
 ~~~
 
 ---

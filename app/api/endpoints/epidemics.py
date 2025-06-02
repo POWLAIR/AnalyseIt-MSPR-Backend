@@ -1,8 +1,8 @@
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.orm import Session
 from sqlalchemy import func, desc
-from ..db.session import get_db
-from ..db.models.base import Epidemic, DailyStats
+from app.db.session import get_db
+from app.db.models.base import Epidemic, DailyStats
 from typing import Optional
 import logging
 from datetime import datetime, timedelta

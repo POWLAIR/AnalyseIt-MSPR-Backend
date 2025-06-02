@@ -2,11 +2,11 @@ from fastapi import APIRouter, Depends, HTTPException, BackgroundTasks, Query
 from sqlalchemy.orm import Session
 from sqlalchemy import inspect, text
 import logging
-from ...db.session import engine
-from ...db.models.base import Base
-from ..dependencies import get_db_session
-from ...services.data_extraction import extract_and_load_datasets
-from ...db.session import get_db
+from app.db.session import engine
+from app.db.models.base import Base
+from app.api.dependencies import get_db_session
+from app.services.data_extraction import extract_and_load_datasets
+from app.db.session import get_db
 
 # Configurer le logger
 logger = logging.getLogger(__name__)
@@ -96,7 +96,7 @@ async def run_etl(
         # Suppression des données existantes si demandé
         if reset:
             logger.info("Suppression des données existantes...")
-            from ...db.repositories import epidemic_repository
+            from app.db.repositories import epidemic_repository
             # Supprimer toutes les épidémies existantes
             epidemics = epidemic_repository.get_epidemics(db, skip=0, limit=1000)
             for epidemic in epidemics:

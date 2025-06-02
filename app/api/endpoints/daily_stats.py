@@ -1,9 +1,11 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-from ..db.session import get_db
-from ..db.models.base import DailyStats
+from app.db.session import get_db
+from app.db.models.base import DailyStats
+from sqlalchemy import func, desc
+from datetime import datetime, timedelta
 import logging
-from ..api.schemas import DailyStatsUpdate
+from app.api.schemas import DailyStatsUpdate
 
 logger = logging.getLogger(__name__)
 router = APIRouter()

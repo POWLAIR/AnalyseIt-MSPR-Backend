@@ -1,6 +1,8 @@
 from typing import Dict, Any
 from sqlalchemy.orm import Session
-from ..db.models.base import Epidemic, DailyStats, Localisation, DataSource
+from app.db.models.base import Epidemic, DailyStats, Localisation, DataSource
+import pandas as pd
+import logging
 
 def run_etl(db: Session) -> Dict[str, Any]:
     """

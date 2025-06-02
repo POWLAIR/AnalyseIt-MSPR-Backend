@@ -10,8 +10,8 @@ from kagglehub import dataset_download
 from sqlalchemy.exc import SQLAlchemyError, OperationalError
 from typing import Dict, Any
 
-from ..db.models.base import Epidemic, DailyStats, Localisation, DataSource, OverallStats
-from ..utils.data_cleaning import clean_dataset
+from app.db.models.base import Epidemic, DailyStats, Localisation, DataSource, OverallStats
+from app.utils.data_cleaning import clean_dataset
 
 logger = logging.getLogger(__name__)
 

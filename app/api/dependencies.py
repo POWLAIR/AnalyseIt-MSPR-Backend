@@ -1,6 +1,6 @@
 from typing import Generator
 from sqlalchemy.orm import Session
-from ..db.session import engine
+from app.db.session import engine
 
 def get_db_session() -> Generator[Session, None, None]:
     """
